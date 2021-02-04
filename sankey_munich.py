@@ -6,18 +6,19 @@ import chart_studio
 import chart_studio.plotly as py
 
 # %%
-df_flows = pd.read_excel('data/energy_sankey_v2.xlsx', engine = 'openpyxl',sheet_name = 'flows')
-df_labels= pd.read_excel('data/energy_sankey_v2.xlsx', engine = 'openpyxl',sheet_name = 'labels')
+df_flows = pd.read_excel('data/energy_sankey.xlsx', engine = 'openpyxl',sheet_name = 'flows')
+df_labels= pd.read_excel('data/energy_sankey.xlsx', engine = 'openpyxl',sheet_name = 'labels')
 
 df_flows = df_flows.dropna()
 df_labels = df_labels.dropna()
 df_labels.head()
 # %%
-opacity = 0.4
+opacity = 0.1
 fig = go.Figure(data=[go.Sankey(
     valueformat = ".0f",
     valuesuffix = "GJ",
     arrangement = 'snap',
+    orientation = 'h',
     # Define nodes
     node = dict(
       pad = 20,
@@ -34,14 +35,7 @@ fig = go.Figure(data=[go.Sankey(
       color =  df_flows.Color
 ))])
 #fig.update_layout(title_text="Flow Color Coding: Blue-Households, Orange-Industry, Green-Transportation", font_size=8)
-fig.update_layout(
-    title={
-        'text': "*Flow Color Coding: Blue-Households, Orange-Industry, Green-Transportation",
-        'y':0.1,
-        'x':0.5,
-        'xanchor': 'center',
-        'yanchor': 'bottom',
-        'font_size':9})
+
 fig.show()
 # %%
 username = 'adam_misik' # your username
