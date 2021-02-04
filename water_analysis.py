@@ -37,15 +37,15 @@ import plotly.express as px
 # Create figure with secondary y-axis
 fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-fig.add_trace(go.Scatter(x=data['Berichtsjahr'], y=data['Wasserabg. an Haush. u. Kleingew. je Einw. und Tag'],name='Water supply',mode='lines'))
+fig.add_trace(go.Scatter(x=data['Berichtsjahr'], y=data['Wasserabg. an Haush. u. Kleingew. je Einw. und Tag'],name='Daily water supply per occupant of household',mode='lines'))
 fig.add_trace(
-    go.Scatter(x=data['Berichtsjahr'] , y=data['Wassergewinnung'],name='Water extraction',mode='lines'),
-    secondary_y=True
-)
-fig.update_yaxes(title_text="Water extraction in 1000cbm", secondary_y=True)
-fig.update_yaxes(title_text="Daily water supply per occupant in l", secondary_y=False)
-fig.update_xaxes(title_text="Year")
+    go.Scatter(x=data['Berichtsjahr'], y=data['Wassergewinnung']*1000,name='Yearly water extraction',mode='lines'))
+fig.add_trace(
+    go.Scatter(x=data['Berichtsjahr'], y=data['Wasserabgabe an Haushalte und Kleingewerbe']*1000,name='Yearly total water supply to households',mode='lines'))
 
+fig.update_yaxes(title_text="Water volume in l", secondary_y=False)
+fig.update_xaxes(title_text="Year")
+fig.update_yaxes(type="log",range=[0,9])
 fig.show()
 
 
@@ -58,6 +58,5 @@ py.plot(fig, filename = 'water_supply_curve', auto_open=True)
 # %%
 import chart_studio.tools as tls
 tls.get_embed('https://plotly.com/~adam_misik/62') #change to your url
-
 
 # %%

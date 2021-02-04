@@ -22,26 +22,37 @@ chart_studio.tools.set_credentials_file(username=username, api_key=api_key)
 
 
 # %%
-data = pd.read_excel('DATA_Industry_Materials.xlsx')
+data = pd.read_excel('data/industry_materials.xlsx')
 data = data[6:]
-data.head(10)
+data = data.fillna(0)
+data.head(30)
 
 # %% [markdown]
 # ### Analysis of material price and quantities
-
-# %%
-data
 # %%
 import plotly.graph_objects as go
 
-
 fig = go.Figure(go.Scatter(x=data['Unnamed: 3'], y=data['Unnamed: 5'], name = '2018',mode='markers', hovertemplate='<b>Price: </b>: €%{y:.2f}'+
     '<br><b>Enterprises: </b>: %{x}<br>'+' <b>Material: <b>' + '<i>%{text}</i>',text=data['Unnamed: 1']))
+
 fig.update_layout(xaxis_title='Number of enterprises', yaxis_title='Price in €')
-fig.add_trace(go.Scatter(x=data['Unnamed: 9'], y=data['Unnamed: 11'], mode='markers',name='2017',hovertemplate='<b>Price: </b>: €%{y:.2f}'+
-    '<br><b>Enterprises: </b>: %{x}<br>'+' <b>Material: <b>' + '<i>%{text}</i>', text=data['Unnamed: 1']))
-fig.add_trace(go.Scatter( x=data['Unnamed: 15'], y=data['Unnamed: 17'], mode='markers',name='2016',hovertemplate='<b>Price: </b>: €%{y:.2f}'+
-    '<br><b>Enterprises: </b>: %{x}<br>'+' <b>Material: <b>' + '<i>%{text}</i>', text=data['Unnamed: 1']))
+#fig.add_trace(go.Scatter(x=data['Unnamed: 9'], y=data['Unnamed: 11'], mode='markers',name='2017',hovertemplate='<b>Price: </b>: €%{y:.2f}'+
+    #'<br><b>Enterprises: </b>: %{x}<br>'+' <b>Material: <b>' + '<i>%{text}</i>', text=data['Unnamed: 1']))
+#fig.add_trace(go.Scatter( x=data['Unnamed: 15'], y=data['Unnamed: 17'], mode='markers',name='2016',hovertemplate='<b>Price: </b>: €%{y:.2f}'+
+    #'<br><b>Enterprises: </b>: %{x}<br>'+' <b>Material: <b>' + '<i>%{text}</i>', text=data['Unnamed: 1']))
+# %%
+data['No.Enterprises']  = data['Unnamed: 3']
+data['Price in €']  = data['Unnamed: 5']
+data['Industrial branch']  = data['Unnamed: 6']
+data['No.Enterprises'] = data['No.Enterprises'].replace(0,1)
+data['Industrial branch'] = data['Industrial branch'].replace(0,'Other')
+
+data['Industrial branch'] = data['Industrial branch'].replace({'0':'Other'})
+
+fig = px.scatter(data,x='No.Enterprises',y='Price in €',color='Industrial branch',hover_name='Unnamed: 1',color_discrete_sequence=px.colors.qualitative.Alphabet)
+fig.update_layout(xaxis_title='Number of enterprises', yaxis_title='Price in €')
+
+fig.show()
 
 # %%
 import chart_studio.plotly as py
@@ -54,10 +65,6 @@ tls.get_embed('https://plotly.com/~adam_misik/4/') #change to your url
 
 # %% [markdown]
 # ### Temporal analysis of interesting materials/goods
-
-# %%
-print(data[data['Unnamed: 1']=='Motor vehicles and engines'].index.values-6)
-
 
 # %%
 motor_vehicles_data = data.iloc[[228]]

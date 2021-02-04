@@ -27,9 +27,8 @@ chart_studio.tools.set_credentials_file(username=username, api_key=api_key)
 
 # %%
 #Read Excel-Sheet
-data = pd.read_excel('EnergyPerBuilding_Munich-2015-0_0.xlsx')
+data = pd.read_excel('data/households_heat_energy.xlsx')
 data.head(10)
-
 
 # %%
 #Formatting
@@ -57,14 +56,15 @@ geo_coordinates[cols] = geo_coordinates[cols].apply(pd.to_numeric, downcast='flo
 # Calculate the optimal amount of clusters with Elbow method
 K_clusters = range(1,10)
 kmeans = [KMeans(n_clusters=i) for i in K_clusters]
-Y_axis = geo_coordinates[['lat']]
-X_axis = geo_coordinates[['lon']]
+Y_axis = geo_coordinates[['Latitude']]
+X_axis = geo_coordinates[['Longitude']]
 score = [kmeans[i].fit(Y_axis).score(Y_axis) for i in range(len(kmeans))]
 # Visualize
 plt.plot(K_clusters, score)
 plt.xlabel('Number of Clusters')
-plt.ylabel('Score')
-plt.title('Elbow Curve')
+plt.ylabel('Sum of distances to cluster center')
+plt.title('Elbow Curve Method')
+plt.savefig('/Users/adammisik/Documents/01_TUM/02_Master/02_Wahlmodule/05_PropENS/02_Coding/Digital_twin_Munich/Elbow_curve.png')
 plt.show()
 
 
@@ -95,8 +95,6 @@ for i in range(n_clusters):
     print(i, sample_i)
 geo_coordinates_red = geo_coordinates.iloc[indices] 
 labels_red = labels[indices]
-
-
 # %%
 # Visualize the clustering results (as the data is too big for a viz, slice it randomly with an index range)
 import plotly.express as px
@@ -169,23 +167,32 @@ tls.get_embed('https://plotly.com/~adam_misik/6/') #change to your url
 
 # %% [markdown]
 # ## Correlation between heat demand and occupants
-
+# %%
+geo_coordinates['Occupants'].head(20)
 # %%
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 # Create figure with secondary y-axis
-fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+fig = make_subplots(rows=1,cols=2,specs=[[{"type": "box"}, {"type": "xy"}]],horizontal_spacing=0.2)
+
+occupants = geo_coordinates_red['Occupants']
+
+#fig.add_trace(go.Histogram(x=occupants,histnorm="probability",nbinsx=50),row=1,col=1)
+fig.add_trace(go.Box(y=occupants,name="Occupants Boxplot"),row=1,col=1)
 
 geo_coordinates_red['Yearly heat demand in kW'] = geo_coordinates_red['Heat demand']/1000
-fig.add_trace(go.Histogram(x=geo_coordinates_red['Occupants']))
-fig.add_trace(
-    go.Line(x=geo_coordinates_red['Occupants'] , y=geo_coordinates_red['Yearly heat demand in kW'],mode='markers'),
-    secondary_y=True
-)
-fig.update_yaxes(title_text="Yearly heat demand in kW", secondary_y=True)
-fig.update_yaxes(title_text="Count", secondary_y=False)
-fig.update_xaxes(title_text="Occupants")
-fig.update_layout(showlegend=False)
+geo_coordinates_red = geo_coordinates_red.groupby(['Occupants']).mean()
+
+geo_coordinates_red = geo_coordinates_red.reset_index()
+
+fig.add_trace(go.Line(x=geo_coordinates_red['Occupants'] , y=geo_coordinates_red['Yearly heat demand in kW'],name='Average heat demand <br> per occupants/building'),row=1,col=2)
+fig.update_yaxes(title_text="Yearly heat demand in kW",row=1,col=2)
+fig.update_yaxes(title_text="Occupants in building",row=1,col=1)
+fig.update_xaxes(title_text="Occupants",row=1,col=2)
+#fig.update_xaxes(title_text="Occupants",row=1,col=1)
+
+#fig.update_layout(showlegend=False)
 
 fig.show()
 
@@ -197,7 +204,7 @@ py.plot(fig, filename = 'relation_occupants_heat_demand', auto_open=True)
 
 # %%
 import chart_studio.tools as tls
-tls.get_embed('https://plotly.com/~adam_misik/50/') #change to your url
+tls.get_embed('https://plotly.com/~adam_misik/66/') #change to your url
 
 
 # %%
