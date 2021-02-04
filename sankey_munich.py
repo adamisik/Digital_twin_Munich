@@ -6,8 +6,8 @@ import chart_studio
 import chart_studio.plotly as py
 
 # %%
-df_flows = pd.read_excel('energy_sankey.xlsx', engine = 'openpyxl',sheet_name = 'flows')
-df_labels= pd.read_excel('energy_sankey.xlsx', engine = 'openpyxl',sheet_name = 'labels')
+df_flows = pd.read_excel('data/energy_sankey.xlsx', engine = 'openpyxl',sheet_name = 'flows')
+df_labels= pd.read_excel('data/energy_sankey.xlsx', engine = 'openpyxl',sheet_name = 'labels')
 df_flows = df_flows.dropna()
 df_labels = df_labels.dropna()
 df_labels.head()
@@ -31,8 +31,7 @@ fig = go.Figure(data=[go.Sankey(
       target =  df_flows.Target,
       value =  df_flows.Value,
       color =  df_flows.Color
-))])
-
+))],)
 fig.show()
 # %%
 username = 'adam_misik' # your username
